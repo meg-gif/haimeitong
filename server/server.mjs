@@ -27,6 +27,8 @@ const initialData = {
       name: "平台管理员",
       email: "admin@example.com",
       roles: ["admin", "buyer", "seller"],
+      primaryRole: "admin",
+      sellerStatus: "approved",
       passwordHash: hashPassword("admin123"),
       balance: 2480,
       createdAt: now(),
@@ -36,6 +38,8 @@ const initialData = {
       name: "演示买家",
       email: "buyer@example.com",
       roles: ["buyer"],
+      primaryRole: "buyer",
+      sellerStatus: "none",
       passwordHash: hashPassword("buyer123"),
       balance: 2480,
       createdAt: now(),
@@ -44,7 +48,9 @@ const initialData = {
       id: "user_seller",
       name: "演示卖家",
       email: "seller@example.com",
-      roles: ["seller"],
+      roles: ["buyer", "seller"],
+      primaryRole: "seller",
+      sellerStatus: "approved",
       passwordHash: hashPassword("seller123"),
       balance: 0,
       createdAt: now(),
@@ -172,7 +178,9 @@ async function handleApi(req, res) {
       id: id("user"),
       name: body.name || email,
       email,
-      roles: [role],
+      roles: role === "seller" ? ["buyer", "seller"] : ["buyer"],
+      primaryRole: role === "seller" ? "seller" : "buyer",
+      sellerStatus: role === "seller" ? "approved" : "none",
       passwordHash: hashPassword(body.password),
       balance: 0,
       createdAt: now(),
@@ -455,7 +463,15 @@ function createSession(data, userId) {
 }
 
 function publicUser(user) {
-  return { id: user.id, name: user.name, email: user.email, roles: user.roles, balance: user.balance };
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    roles: user.roles,
+    primaryRole: user.primaryRole || (user.roles?.includes("seller") ? "seller" : "buyer"),
+    sellerStatus: user.sellerStatus || (user.roles?.includes("seller") ? "approved" : "none"),
+    balance: user.balance,
+  };
 }
 
 function hasRole(user, role) {
