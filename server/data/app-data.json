@@ -9,6 +9,8 @@
         "buyer",
         "seller"
       ],
+      "primaryRole": "admin",
+      "sellerStatus": "approved",
       "passwordHash": "c8d0f96e6d16086eee3be564817af84273d9cc142dea09aaf2007764feacc38a",
       "balance": 2480,
       "createdAt": "2026-04-22T04:17:12.457Z"
@@ -20,6 +22,8 @@
       "roles": [
         "buyer"
       ],
+      "primaryRole": "buyer",
+      "sellerStatus": "none",
       "passwordHash": "b3b332b8638c91dcdbc0351ddee4b080c44bb8c941f170f575911ecbcd5abe91",
       "balance": 2480,
       "createdAt": "2026-04-22T04:17:12.458Z"
@@ -29,8 +33,11 @@
       "name": "演示卖家",
       "email": "seller@example.com",
       "roles": [
+        "buyer",
         "seller"
       ],
+      "primaryRole": "seller",
+      "sellerStatus": "approved",
       "passwordHash": "21c8b26f4cd77f0c6eecf876326cbc75f665354784704fb2c2c560e7030fb931",
       "balance": 0,
       "createdAt": "2026-04-22T04:17:12.458Z"
