@@ -1,93 +1,43 @@
-function categorySummary(limit = 4) {
-  return Object.entries(
-    mediaList.reduce((acc, item) => {
-      acc[item.category] = (acc[item.category] || 0) + 1;
-      return acc;
-    }, {})
-  )
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
-}
-
-function sellerMix(media) {
-  const ownerCount = media.sellers.filter((seller) => seller.role === "Owner").length;
-  return ownerCount ? "含网站所有者报价" : "仅代理/合作方报价";
-}
-
 function homePage() {
   const featured = mediaList.filter((item) => item.featured);
-  const categoryCards = categorySummary();
-  const fastTrack = [...mediaList]
-    .sort((a, b) => minSellerPrice(a) - minSellerPrice(b))
-    .slice(0, 3);
   return `
-    <section class="hero hero--editorial">
+    <section class="hero">
       <div class="hero-copy">
         <p class="eyebrow">海外 SEO · PR 发稿 · 品牌曝光</p>
-        <h1>把海外媒体投放，从“问价碰运气”变成可对比的采购系统</h1>
-        <p class="lead">按国家、行业、语言和 SEO 指标筛选媒体网站，再对比同一网站下不同 Owner 与 Reseller 的报价、交付规则和链接属性，直接找到更稳的渠道和更低的成本。</p>
-        <div class="hero-badges">
-          <span>多卖家同站比价</span>
-          <span>SEO 指标直观筛选</span>
-          <span>下单到验收全流程跟踪</span>
-        </div>
+        <h1>拒绝发文乱报价，筛选全网低价服务商</h1>
+        <p class="lead">按国家、行业、语言和 SEO 指标精准筛选媒体，同一网站对比多个服务商报价，帮你找到更低价格。</p>
         <div class="hero-actions">
-          <a class="button primary" href="#/media">浏览媒体市场</a>
-          <a class="button secondary" href="#/contact">Contact Us</a>
-        </div>
-        <div class="hero-mini-stats">
-          <div><span>上线媒体</span><strong>${stats.mediaCount}</strong></div>
-          <div><span>平均交付</span><strong>${stats.avgDelivery}</strong></div>
-          <div><span>覆盖国家</span><strong>${stats.countries}</strong></div>
+          <a class="button primary" href="#/media">发布你的第一篇文章</a>
+          <a class="button secondary" href="#/publisher">网站合作伙伴入驻</a>
         </div>
       </div>
-      <div class="hero-panel hero-panel--stack" aria-label="平台业务概览">
+      <div class="hero-panel" aria-label="平台业务概览">
         <div class="panel-top">
-          <span>GLOBAL BUYING DESK</span>
-          <strong>适合出海品牌的投放视图</strong>
-        </div>
-        <div class="signal-card">
-          <div>
-            <span>本周热度最高</span>
-            <strong>科技 / 金融 / Web3 出海稿件</strong>
-          </div>
-          <b>+18%</b>
+          <span>GLOBAL MEDIA NETWORK</span>
+          <strong>按行业匹配海外媒体资源</strong>
         </div>
         <div class="market-board">
           <div class="board-row headline">
-            <span>${featured[0]?.name || "NorthTech Daily"}</span><em>Owner / Reseller 多报价并存</em>
+            <span>金融媒体</span><em>品牌曝光 · 合规内容</em>
           </div>
-          ${categoryCards
-            .map(
-              ([name, count]) => `
-                <div class="board-row">
-                  <span>${name}</span><em>${count} 个资源在售</em>
-                </div>
-              `
-            )
-            .join("")}
+          <div class="board-row">
+            <span>区块链 Web3</span><em>交易所 · 钱包 · 链上工具</em>
+          </div>
+          <div class="board-row">
+            <span>科技媒体</span><em>SaaS · AI · 消费电子</em>
+          </div>
+          <div class="board-row">
+            <span>多产业垂直媒体</span><em>按国家与行业筛选</em>
+          </div>
           <div class="board-chart" aria-hidden="true">
-            <i style="height: 38%"></i><i style="height: 61%"></i><i style="height: 52%"></i>
-            <i style="height: 74%"></i><i style="height: 68%"></i><i style="height: 86%"></i>
+            <i style="height: 42%"></i><i style="height: 66%"></i><i style="height: 54%"></i>
+            <i style="height: 78%"></i><i style="height: 48%"></i><i style="height: 88%"></i>
           </div>
-        </div>
-        <div class="quote-ladder">
-          ${fastTrack
-            .map(
-              (item) => `
-                <div>
-                  <span>${item.name}</span>
-                  <strong>$${minSellerPrice(item)} 起</strong>
-                  <em>${sellerMix(item)}</em>
-                </div>
-              `
-            )
-            .join("")}
         </div>
         <div class="mini-list">
           <span>媒体审核</span><strong>92%</strong>
+          <span>平均发布</span><strong>${stats.avgDelivery}</strong>
           <span>订单跟踪</span><strong>在线</strong>
-          <span>询价效率</span><strong>高于人工表格</strong>
         </div>
       </div>
     </section>
@@ -99,55 +49,7 @@ function homePage() {
       ${metric("行业分类", stats.categories)}
     </section>
 
-    <section class="section story-strip">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">平台价值</p>
-          <h2>海媒通帮助品牌把海外媒体曝光做成一条更稳定的增长链路</h2>
-        </div>
-      </div>
-      <div class="insight-grid">
-        <article>
-          <span>01</span>
-          <strong>覆盖出海品牌常见推广目标</strong>
-          <p>无论是品牌曝光、SEO 外链、融资新闻、产品发布还是地区市场声量，都能快速匹配对应媒体资源。</p>
-        </article>
-        <article>
-          <span>02</span>
-          <strong>提高品牌在海外市场的可信度</strong>
-          <p>通过真实媒体背书、搜索结果覆盖和品牌相关文章布局，帮助用户在陌生市场里更快建立信任。</p>
-        </article>
-        <article>
-          <span>03</span>
-          <strong>减少人工沟通与试错成本</strong>
-          <p>统一展示媒体规则、国家、价格区间和基础指标，避免反复询价和低效筛选。</p>
-        </article>
-      </div>
-    </section>
-
     <section class="section">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">为什么海媒通能帮助出海</p>
-          <h2>从品牌建设到搜索可见度，公开媒体曝光依然是出海增长的底层能力</h2>
-        </div>
-      </div>
-      <div class="category-grid">
-        ${categoryCards
-          .map(
-            ([name, count], index) => `
-              <article class="category-card">
-                <span>0${index + 1}</span>
-                <strong>${name}</strong>
-                <p>${count} 个可浏览资源，适合不同阶段的出海品牌做曝光、收录和口碑沉淀。</p>
-              </article>
-            `
-          )
-          .join("")}
-      </div>
-    </section>
-
-    <section class="section featured-section">
       <div class="section-head">
         <div>
           <p class="eyebrow">精选资源</p>
@@ -155,42 +57,22 @@ function homePage() {
         </div>
         <a class="text-link" href="#/media">查看全部</a>
       </div>
-      <div class="featured-layout">
-        <div class="card-grid">
-          ${featured.map(mediaCard).join("")}
-        </div>
-        <aside class="content-block compare-card">
-          <p class="eyebrow">平台能力</p>
-          <h2>你可以先浏览，再决定是否登录进入工作台</h2>
-          <div class="todo-list">
-            <div><span class="status success">公开浏览</span><strong>未登录即可查看平台介绍和媒体市场</strong></div>
-            <div><span class="status info">登录后操作</span><strong>登录后进入 Buyer / Seller 工作台，再继续下单或管理资源</strong></div>
-            <div><span class="status warning">人工协助</span><strong>对资源、报价或合作有疑问时，可直接通过 Contact Us 提交问题</strong></div>
-          </div>
-          <a class="button ghost full" href="#/register">注册进入工作台</a>
-        </aside>
+      <div class="card-grid">
+        ${featured.map(mediaCard).join("")}
       </div>
     </section>
 
-    <section class="section split split-alt">
+    <section class="section split">
       <div>
-        <p class="eyebrow">工作方式</p>
-        <h2>先了解平台，再浏览资源，最后进入工作台进行真实操作</h2>
-        <p class="muted">海媒通的公开站点负责品牌说明和资源浏览，登录后的 Buyer / Seller 工作台负责订单、投放和履约管理。</p>
+        <p class="eyebrow">交易流程</p>
+        <h2>一个网站，可以由网站所有者或 Reseller/代理商接单</h2>
+        <p class="muted">平台作为撮合方展示网站所有者、合作编辑、SEO 专家和媒体代理的不同报价、链接属性、Sponsored 规则和交付周期。</p>
       </div>
       <div class="steps">
-        ${["了解平台", "浏览媒体", "登录/注册", "进入工作台", "继续交易"]
+        ${["选择网站", "选择卖家", "提交稿件", "平台审核", "发布验收"]
           .map((step, index) => `<div><span>${index + 1}</span><strong>${step}</strong></div>`)
           .join("")}
       </div>
-    </section>
-
-    <section class="section cta-band">
-      <div>
-        <p class="eyebrow">准备继续完善这个项目</p>
-        <h2>当前先保留官网三页结构，后续你确认后我再继续细化内容、视觉和登录后的流程页</h2>
-      </div>
-      <a class="button primary" href="#/register">注册体验工作台</a>
     </section>
   `;
 }
@@ -199,22 +81,12 @@ function mediaListPage() {
   const loggedIn = isLoggedIn();
   const visibleItems = loggedIn ? mediaList.slice(0, 20) : mediaList.slice(0, 20);
   const disabled = loggedIn ? "" : "disabled";
-  const lowestPrice = Math.min(...mediaList.map((item) => minSellerPrice(item)));
-  const ownerReady = mediaList.filter((item) => item.sellers.some((seller) => seller.role === "Owner")).length;
-  const indexedReady = mediaList.filter((item) => item.indexed || item.sellers.some((seller) => seller.indexed)).length;
 
   return `
     <section class="page-title">
-      <p class="eyebrow">媒体市场</p>
-      <h1>先浏览资源，再登录进入工作台进行后续操作</h1>
-      <p class="muted">当前页面仅用于公开展示海媒通的媒体资源能力。你可以查看资源基础信息和指标分布，但不能在未登录状态下直接购买。</p>
-    </section>
-
-    <section class="market-summary">
-      <article><span>可比价媒体</span><strong>${mediaList.length}</strong><em>当前 mock 数据已支持完整筛选逻辑</em></article>
-      <article><span>最低起价</span><strong>$${lowestPrice}</strong><em>适合先做预算试投</em></article>
-      <article><span>含 Owner 报价</span><strong>${ownerReady}</strong><em>优先查看网站所有者直连资源</em></article>
-      <article><span>可做收录承诺</span><strong>${indexedReady}</strong><em>含媒体本身或卖家承诺收录</em></article>
+      <p class="eyebrow">媒体资源市场</p>
+      <h1>按指标筛选海外媒体网站</h1>
+      <p class="muted">列表页筛选的是网站本身；进入购买页后，再选择该网站下的 Owner 或 Reseller 报价。</p>
     </section>
 
     ${
@@ -222,10 +94,10 @@ function mediaListPage() {
         ? ""
         : `<section class="gate-banner">
             <div>
-              <strong>公开市场仅提供浏览与了解</strong>
-              <p>登录/注册后进入 Buyer 或 Seller 工作台，继续查看详情、创建订单或管理报价。</p>
+              <strong>未登录仅可预览第一页资源</strong>
+              <p>注册/登录后可查看全部媒体，并使用流量、DR、DA、收录和链接属性筛选器。</p>
             </div>
-            <a class="button primary" href="#/login">登录后继续</a>
+            <a class="button primary" href="#/login">注册/登录解锁全部</a>
           </section>`
     }
 
@@ -248,7 +120,7 @@ function mediaListPage() {
       <div class="section-head">
         <div>
           <h2>媒体列表</h2>
-          <p class="muted">${loggedIn ? "已登录可继续进入详情与工作台流程。" : "当前为公开浏览模式，只展示资源，不提供直接购买操作。"}</p>
+          <p class="muted">${loggedIn ? "当前可筛选全部 mock 媒体资源。" : "当前为未登录预览模式，仅展示第一页资源。"}</p>
         </div>
       </div>
       <div data-media-table>${mediaTable(visibleItems)}</div>
@@ -263,7 +135,6 @@ function mediaListPage() {
 
 function mediaDetailPage(id) {
   const media = mediaList.find((item) => item.id === id) || mediaList[0];
-  const ownerSeller = media.sellers.find((seller) => seller.role === "Owner");
   return `
     <section class="media-buy-header">
       <div class="buy-title-row">
@@ -289,45 +160,6 @@ function mediaDetailPage(id) {
         <div><span>Link attribution type</span><strong>${media.linkType === "Nofollow" ? "No follow" : "Do follow"}</strong></div>
         <div><span>Indexing</span><strong>${media.indexed ? "包收录" : "不包收录"}</strong></div>
       </div>
-    </section>
-
-    <section class="detail-grid media-detail-grid">
-      <article class="content-block wide detail-overview-card">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">媒体概览</p>
-            <h2>${media.name}</h2>
-          </div>
-          <span class="status ${ownerSeller ? "success" : "info"}">${ownerSeller ? "含网站所有者直连报价" : "仅代理报价"}</span>
-        </div>
-        <p>${media.description}</p>
-        <div class="detail-chip-grid">
-          <div><span>最低报价</span><strong>$${minSellerPrice(media)}</strong></div>
-          <div><span>卖家数量</span><strong>${media.sellers.length}</strong></div>
-          <div><span>推荐交付</span><strong>${media.delivery}</strong></div>
-          <div><span>适合场景</span><strong>${media.type}</strong></div>
-        </div>
-      </article>
-      <article class="content-block">
-        <p class="eyebrow">适合发布</p>
-        <h2>接稿范围</h2>
-        <div class="tag-row">
-          ${media.accepts.map((item) => `<span>${item}</span>`).join("")}
-        </div>
-        <h3>不接受内容</h3>
-        <div class="tag-row warning-tags">
-          ${media.rejects.map((item) => `<span>${item}</span>`).join("")}
-        </div>
-      </article>
-      <article class="content-block">
-        <p class="eyebrow">投稿要求</p>
-        <h2>编辑规则</h2>
-        <p>${media.requirements}</p>
-        <h3>适合选题</h3>
-        <div class="channel-list">
-          ${media.examples.map((example) => `<div class="channel-row"><strong>${example}</strong><span>适合品牌稿或新闻稿切入</span></div>`).join("")}
-        </div>
-      </article>
     </section>
 
     <section class="performer-section">
@@ -431,112 +263,27 @@ function orderPage(id, sellerId) {
 
 function loginPage() {
   return `
-    <section class="login-shell">
-      <div class="login-intro">
-        <p class="eyebrow">账号入口</p>
-        <h1>登录后进入 Buyer / Seller 工作台</h1>
-        <p class="muted">未登录时看到的是平台品牌站；登录后进入交易后台。Buyer 无门槛，Seller 需要申请并通过审核，且默认同时拥有 Buyer 能力。</p>
-        <div class="todo-list">
-          <div><span class="status success">Buyer</span><strong>查看订单、余额与稿件验收</strong></div>
-          <div><span class="status info">Seller</span><strong>提交媒体报价、处理接单与交付</strong></div>
-          <div><span class="status warning">Public</span><strong>未登录时优先展示平台品牌、媒体市场与成为 Seller 入口</strong></div>
-        </div>
-      </div>
-      <div class="login-panel">
-        <form class="form-card login-card" data-login-form>
-          <p class="eyebrow">账号演示</p>
-          <h2>选择登录角色并进入工作台</h2>
-          <label><span>登录角色</span><select name="login-role"><option value="buyer">Buyer</option><option value="seller">Seller</option></select></label>
-          <label><span>邮箱</span><input type="email" placeholder="name@example.com" /></label>
-          <label><span>密码</span><input type="password" placeholder="请输入密码" /></label>
-          <button class="button primary" type="submit">登录进入系统</button>
-        </form>
-        <aside class="content-block demo-account-card">
-          <p class="eyebrow">快速填充</p>
-          <h2>演示账号</h2>
-          <div class="demo-account-list">
-            <button class="mini-button" type="button" data-demo-login data-email="buyer@example.com" data-password="buyer123">买家账号</button>
-            <button class="mini-button" type="button" data-demo-login data-email="seller@example.com" data-password="seller123">卖家账号</button>
-          </div>
-          <p class="muted">Seller 登录后默认进入 Seller 后台，并可切换到 Buyer 视角；Buyer 不能直接进入 Seller 后台。</p>
-        </aside>
-      </div>
-    </section>
-  `;
-}
-
-function registerPage() {
-  return `
-    <section class="login-shell">
-      <div class="login-intro">
-        <p class="eyebrow">Create Account</p>
-        <h1>注册海媒通账号，进入 Buyer 或 Seller 工作台</h1>
-        <p class="muted">Buyer 可直接开始使用；Seller 可用 Seller 身份注册演示账号，后续再细化申请和审核流程。</p>
-      </div>
-      <div class="login-panel">
-        <form class="form-card login-card" data-register-form>
-          <p class="eyebrow">注册</p>
-          <h2>创建账号</h2>
-          <label><span>注册角色</span><select name="role"><option value="buyer">Buyer</option><option value="seller">Seller</option></select></label>
-          <label><span>姓名</span><input name="name" placeholder="你的名字或公司名" /></label>
-          <label><span>邮箱</span><input name="email" type="email" placeholder="name@example.com" /></label>
-          <label><span>密码</span><input name="password" type="password" placeholder="至少 6 位" /></label>
-          <button class="button primary" type="submit">注册并进入工作台</button>
-        </form>
-        <aside class="content-block demo-account-card">
-          <p class="eyebrow">已有账号？</p>
-          <h2>直接登录</h2>
-          <a class="button ghost full" href="#/login">去登录</a>
-        </aside>
-      </div>
-    </section>
-  `;
-}
-
-function contactPage() {
-  return `
-    <section class="page-title">
-      <p class="eyebrow">Contact Us</p>
-      <h1>如果你想了解资源、合作或投放方案，可以直接把问题提交给我们</h1>
-      <p class="muted">这一页先保留轻量线索表单。后续你确认后，我可以继续把它做成更完整的品牌联系页。</p>
-    </section>
-
-    <section class="login-shell">
-      <div class="login-intro">
-        <p class="eyebrow">联系方式</p>
-        <h2>适合提交的问题</h2>
-        <div class="todo-list">
-          <div><span class="status success">资源咨询</span><strong>想了解某类国家、行业或语言的媒体资源</strong></div>
-          <div><span class="status info">品牌投放</span><strong>想让我们帮助规划曝光、PR 或 SEO 发布方案</strong></div>
-          <div><span class="status warning">Seller 合作</span><strong>想接入媒体资源、提交站点或成为长期合作方</strong></div>
-        </div>
-      </div>
-      <div class="login-panel">
-        <form class="form-card login-card" data-contact-form>
-          <p class="eyebrow">留言表单</p>
-          <h2>提交你的问题</h2>
-          <label><span>姓名</span><input name="name" placeholder="你的姓名" /></label>
-          <label><span>邮箱</span><input name="email" type="email" placeholder="name@example.com" /></label>
-          <label><span>公司 / 品牌</span><input name="company" placeholder="公司名称（可选）" /></label>
-          <label><span>问题类型</span><select name="topic"><option>媒体资源咨询</option><option>品牌曝光合作</option><option>成为 Seller</option><option>其他问题</option></select></label>
-          <label><span>详细问题</span><textarea name="message" rows="6" placeholder="请描述你的需求、目标市场、预算区间或想咨询的问题"></textarea></label>
-          <button class="button primary" type="submit">提交问题</button>
-        </form>
-      </div>
+    <section class="login-wrap">
+      <form class="form-card login-card" data-login-form>
+        <p class="eyebrow">账号演示</p>
+        <h1>注册/登录后解锁完整媒体库</h1>
+        <p class="muted">这是前端 MVP 的模拟登录。登录后可查看全部媒体，并使用筛选器筛选资源。</p>
+        <label><span>邮箱</span><input type="email" placeholder="name@example.com" /></label>
+        <label><span>密码</span><input type="password" placeholder="请输入密码" /></label>
+        <button class="button primary" type="submit">模拟登录</button>
+      </form>
     </section>
   `;
 }
 
 function dashboardSidebar(active) {
-  const isSellerView = active === "seller";
   return `
     <aside class="sidebar">
-      <strong>${isSellerView ? "Seller Workspace" : "Buyer Workspace"}</strong>
-      <a class="${active === "buyer" ? "active" : ""}" href="#/buyer">Buyer 总览</a>
-      ${typeof canAccessSellerApp === "function" && canAccessSellerApp() ? `<a class="${active === "seller" ? "active" : ""}" href="#/seller">Seller 总览</a>` : ""}
-      <a href="#/media">媒体市场</a>
-      <a href="#/publisher">成为 Seller</a>
-      ${isSellerView ? '<button class="mini-button" data-switch-view="buyer">Switch to Buyer</button>' : ""}
+      <strong>后台中心</strong>
+      <a class="${active === "buyer" ? "active" : ""}" href="#/buyer">买家后台</a>
+      <a class="${active === "seller" ? "active" : ""}" href="#/seller">卖家后台</a>
+      <a class="${active === "admin" ? "active" : ""}" href="#/admin">网站管理员</a>
+      <a href="#/media">媒体资源</a>
       <button class="mini-button subtle" data-logout>退出登录</button>
     </aside>
   `;
@@ -604,12 +351,8 @@ function buyerDashboardPage() {
         </section>
         <section class="workspace-actions">
           <a class="action-tile" href="#/media"><span>继续选媒体</span><strong>进入媒体市场</strong></a>
-          <a class="action-tile" href="#/publisher"><span>升级身份</span><strong>申请成为 Seller</strong></a>
-          ${
-            typeof canAccessSellerApp === "function" && canAccessSellerApp()
-              ? '<a class="action-tile" href="#/seller"><span>切换身份</span><strong>进入 Seller 后台</strong></a>'
-              : '<a class="action-tile" href="#/publisher"><span>开始合作</span><strong>查看 Seller 入驻说明</strong></a>'
-          }
+          <a class="action-tile" href="#/seller"><span>切换身份</span><strong>查看卖家后台</strong></a>
+          <a class="action-tile" href="#/admin"><span>运营视角</span><strong>进入网站管理员后台</strong></a>
         </section>
       </div>
     </section>
@@ -620,8 +363,8 @@ function publisherPage() {
   return `
     <section class="page-title">
       <p class="eyebrow">网站合作入驻</p>
-      <h1>申请成为 Seller，接入海媒通的媒体供给网络</h1>
-      <p class="muted">这里是未登录也可访问的公开合作页。Buyer 可先注册账号，再提交 Seller 申请；审核通过后进入 Seller 工作台。</p>
+      <h1>提交你的海外媒体资源，成为平台合作伙伴</h1>
+      <p class="muted">适合海外站长、垂直媒体、博客 owner、媒体代理和 SEO 服务商。</p>
     </section>
 
     <section class="split publisher-intro">
@@ -630,11 +373,11 @@ function publisherPage() {
         <div class="benefit-grid">
           <div><strong>稳定订单来源</strong><p>面向中国出海客户展示媒体资源。</p></div>
           <div><strong>多卖家报价展示</strong><p>同一网站可展示 Owner 与 Reseller 的不同报价与交付规则。</p></div>
-          <div><strong>审核制 Seller</strong><p>Seller 需要审核通过后开通，开通后默认同时拥有 Buyer 权限。</p></div>
+          <div><strong>平台协助履约</strong><p>平台处理需求整理、订单跟踪和售后沟通。</p></div>
         </div>
       </div>
       <form class="form-card" data-publisher-form>
-        <h2>提交 Seller 申请 / 媒体资源</h2>
+        <h2>提交媒体资源</h2>
         <div class="form-grid">
           <label><span>网站名称</span><input required placeholder="例如：Global Tech Review" /></label>
           <label><span>网站域名</span><input required placeholder="https://example.com" /></label>
@@ -658,7 +401,7 @@ function sellerDashboardPage() {
         <div class="page-title compact-title">
           <p class="eyebrow">Seller Console</p>
           <h1>卖家后台</h1>
-          <p class="muted">卖家可以是网站所有者，也可以是 Reseller/代理商。Seller 默认同时拥有 Buyer 能力，可随时切换查看 Buyer 工作台。</p>
+          <p class="muted">卖家可以是网站所有者，也可以是 Reseller/代理商，用于管理媒体、报价、接单与结算。</p>
         </div>
         <div class="stats">
           ${metric("我的媒体", mediaList.length)}
@@ -707,31 +450,9 @@ function sellerDashboardPage() {
             </div>
           </article>
         </section>
-        <section class="workspace-actions">
-          <a class="action-tile" href="#/buyer"><span>Buyer 视角</span><strong>切换查看我的订单与余额</strong></a>
-          <a class="action-tile" href="#/media"><span>公开市场</span><strong>回到品牌站查看媒体展示效果</strong></a>
-          <a class="action-tile" href="#/publisher"><span>合作说明</span><strong>查看 Seller 公开招商页</strong></a>
-        </section>
       </div>
     </section>
     ${sellerActionModals()}
-  `;
-}
-
-function permissionDeniedPage(message, href = "#/") {
-  return `
-    <section class="login-shell">
-      <div class="login-intro">
-        <p class="eyebrow">访问限制</p>
-        <h1>当前页面不对你的身份开放</h1>
-        <p class="muted">${message}</p>
-      </div>
-      <div class="content-block demo-account-card">
-        <p class="eyebrow">下一步</p>
-        <h2>返回可访问的工作台</h2>
-        <a class="button primary full" href="${href}">返回可访问页面</a>
-      </div>
-    </section>
   `;
 }
 
