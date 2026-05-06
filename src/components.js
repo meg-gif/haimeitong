@@ -1,51 +1,17 @@
 function shell(content, options = {}) {
   const active = options.active || "home";
-  const variant = options.variant || "public";
   const loggedIn = typeof isLoggedIn === "function" && isLoggedIn();
-  const currentUser = typeof getUser === "function" ? getUser() : null;
-  const dashboardView = typeof getDashboardView === "function" ? getDashboardView() : "buyer";
-  const defaultAppRoute = typeof getDefaultAppRoute === "function" ? getDefaultAppRoute() : "#/buyer";
-  const publicNavItems = [
-    ["首页", "#/", active === "home"],
-    ["媒体市场", "#/media", active === "media"],
-    ["Contact Us", "#/contact", active === "contact"],
-  ];
-
-  if (variant === "app") {
-    const appNavItems = dashboardView === "seller"
-      ? [
-          ["Seller 总览", "#/seller", active === "seller"],
-          ["媒体市场", "#/media", active === "media"],
-          ["Buyer 视角", "#/buyer", active === "buyer"],
-        ]
-      : [
-          ["Buyer 总览", "#/buyer", active === "buyer"],
-          ["媒体市场", "#/media", active === "media"],
-          ["成为 Seller", "#/publisher", active === "publisher"],
-        ];
-
-    return `
-      <header class="app-topbar">
-        <a class="brand" href="${defaultAppRoute}">
-          <span class="brand-mark">H</span>
-          <span>
-            <strong>${dashboardView === "seller" ? "Seller Console" : "Buyer Console"}</strong>
-            <small>${currentUser?.name || "海媒通工作台"}</small>
-          </span>
-        </a>
-        <nav class="nav">
-          ${appNavItems.map(([label, href, isActive]) => navLink(label, href, isActive)).join("")}
-        </nav>
-        <div class="topbar-actions">
-          ${dashboardView === "seller" ? '<button class="button ghost" data-switch-view="buyer">Switch to Buyer</button>' : ""}
-          <button class="button ghost nav-recharge" data-open-recharge><span>${dashboardView === "seller" ? "Seller 账户" : "Buyer 账户"}</span><strong>${currentUser?.balance ? `余额 $${currentUser.balance}` : "钱包"}</strong></button>
-          <button class="topbar-cta logout-link" data-logout>退出登录</button>
-        </div>
-      </header>
-      <main class="app-main">${content}</main>
-      ${loggedIn ? rechargeModal() : ""}
-    `;
-  }
+  const navItems = loggedIn
+    ? [
+        ["首页", "#/", active === "home"],
+        ["媒体资源", "#/media", active === "media"],
+        ["网站合作入驻", "#/publisher", active === "publisher"],
+      ]
+    : [
+        ["首页", "#/", active === "home"],
+        ["媒体资源", "#/media", active === "media"],
+        ["网站合作入驻", "#/publisher", active === "publisher"],
+      ];
 
   return `
     <header class="topbar">
@@ -57,29 +23,30 @@ function shell(content, options = {}) {
         </span>
       </a>
       <nav class="nav">
-        ${publicNavItems.map(([label, href, isActive]) => navLink(label, href, isActive)).join("")}
+        ${navItems.map(([label, href, isActive]) => navLink(label, href, isActive)).join("")}
       </nav>
       <div class="topbar-actions">
-        <a class="button ghost" href="#/login">登录</a>
-        <a class="topbar-cta" href="#/register">注册</a>
+        ${loggedIn ? '<button class="button ghost nav-recharge" data-open-recharge><span>余额 $2,480</span><strong>充值</strong></button>' : ""}
+        <a class="topbar-cta" href="${loggedIn ? "#/buyer" : "#/login"}">${loggedIn ? "用户中心" : "注册/登录"}</a>
       </div>
       <button class="menu-button" data-menu-button aria-label="打开导航">菜单</button>
     </header>
     <div class="mobile-nav" data-mobile-nav>
-      ${publicNavItems.map(([label, href, isActive]) => navLink(label, href, isActive)).join("")}
-      <a href="#/login">登录</a>
-      <a href="#/register">注册</a>
+      ${navItems.map(([label, href, isActive]) => navLink(label, href, isActive)).join("")}
+      ${loggedIn ? '<button class="button ghost" data-open-recharge>余额 $2,480 · 充值</button>' : ""}
+      <a href="${loggedIn ? "#/buyer" : "#/login"}">${loggedIn ? "用户中心" : "注册/登录"}</a>
     </div>
     <main>${content}</main>
+    ${loggedIn ? rechargeModal() : ""}
     <footer class="footer">
       <div>
         <strong>海媒通</strong>
-        <p>面向中文用户的海外媒体发稿平台。当前未登录界面是品牌站，登录后进入 Buyer / Seller 工作台。</p>
+        <p>面向中文用户的海外媒体发稿 MVP 原型，当前数据均为 mock。</p>
       </div>
       <div class="footer-links">
-        <a href="#/media">媒体市场</a>
-        <a href="#/contact">Contact Us</a>
-        <a href="#/login">登录</a>
+        <a href="#/media">媒体资源</a>
+        <a href="#/publisher">网站合作入驻</a>
+        ${loggedIn ? '<a href="#/admin">网站管理员后台</a>' : '<a href="#/login">注册/登录</a>'}
       </div>
     </footer>
   `;
@@ -122,8 +89,6 @@ function primarySeller(media) {
 
 function mediaCard(media) {
   const fromPrice = minSellerPrice(media);
-  const actionHref = typeof isLoggedIn === "function" && isLoggedIn() ? `#/media/${media.id}` : "#/login";
-  const actionLabel = typeof isLoggedIn === "function" && isLoggedIn() ? "查看资源" : "登录后查看";
   return `
     <article class="media-card">
       <div class="media-card-head">
@@ -142,7 +107,7 @@ function mediaCard(media) {
       </div>
       <div class="card-action">
         <strong>DR ${media.dr} / DA ${media.da}</strong>
-        <a class="button ghost" href="${actionHref}">${actionLabel}</a>
+        <a class="button ghost" href="#/media/${media.id}">立即购买</a>
       </div>
     </article>
   `;
@@ -186,8 +151,6 @@ function mediaTable(items = mediaList) {
 function mediaTableRow(media) {
   const cheapest = primarySeller(media);
   const hasSponsored = media.sellers.some((seller) => seller.sponsored);
-  const actionHref = typeof isLoggedIn === "function" && isLoggedIn() ? `#/media/${media.id}` : "#/login";
-  const actionLabel = typeof isLoggedIn === "function" && isLoggedIn() ? "查看详情" : "登录后查看";
   return `
     <tr>
       <td>
@@ -202,34 +165,14 @@ function mediaTableRow(media) {
       <td>${media.indexed ? '<span class="status success">包收录</span>' : '<span class="status neutral">不包收录</span>'}</td>
       <td>${hasSponsored ? '<span class="status warning">有</span>' : '<span class="status neutral">无</span>'}</td>
       <td><strong>$${cheapest.price}起</strong></td>
-      <td><a class="table-link" href="${actionHref}">${actionLabel}</a></td>
+      <td><a class="table-link" href="#/media/${media.id}">立即购买</a></td>
     </tr>
   `;
 }
 
 function orderStatus(status) {
-  const labelMap = {
-    pending_payment: "待付款",
-    paid: "已付款",
-    accepted: "已接单",
-    publishing: "发布中",
-    published: "已发布待验收",
-    completed: "已完成",
-    refund_requested: "售后中",
-    cancelled: "已取消",
-  };
-  const toneMap = {
-    pending_payment: "warning",
-    paid: "info",
-    accepted: "info",
-    publishing: "info",
-    published: "warning",
-    completed: "success",
-    refund_requested: "warning",
-    cancelled: "neutral",
-  };
-  const tone = toneMap[status] || (String(status).includes("完成") ? "success" : String(status).includes("待") ? "warning" : "info");
-  return `<span class="status ${tone}">${labelMap[status] || status}</span>`;
+  const tone = status.includes("完成") ? "success" : status.includes("待") ? "warning" : "info";
+  return `<span class="status ${tone}">${status}</span>`;
 }
 
 function select(name, options, attrs = "") {
