@@ -2,8 +2,6 @@ const app = document.querySelector("#app");
 const TOKEN_KEY = "haimeitong_api_token";
 const USER_KEY = "haimeitong_api_user";
 const MOCK_AUTH_KEY = "haimeitong_mock_login";
-const REDIRECT_KEY = "haimeitong_post_login_redirect";
-const DASHBOARD_VIEW_KEY = "haimeitong_dashboard_view";
 const apiMode = location.protocol.startsWith("http");
 
 function getToken() {
@@ -22,69 +20,15 @@ function isLoggedIn() {
   return Boolean(getToken()) || localStorage.getItem(MOCK_AUTH_KEY) === "true";
 }
 
-function getRoles() {
-  return getUser()?.roles || [];
-}
-
-function hasRole(role) {
-  return getRoles().includes(role);
-}
-
-function getPrimaryRole() {
-  const user = getUser();
-  if (!user) return "guest";
-  if (user.primaryRole) return user.primaryRole;
-  return user.roles?.includes("seller") ? "seller" : "buyer";
-}
-
-function canAccessBuyerApp() {
-  return hasRole("buyer") || hasRole("seller");
-}
-
-function canAccessSellerApp() {
-  return hasRole("seller");
-}
-
-function getDefaultAppRoute() {
-  if (getPrimaryRole() === "seller" && canAccessSellerApp()) return "#/seller";
-  if (canAccessBuyerApp()) return "#/buyer";
-  return "#/";
-}
-
-function setRedirect(hash = window.location.hash || "#/") {
-  localStorage.setItem(REDIRECT_KEY, hash);
-}
-
-function consumeRedirect() {
-  const redirect = localStorage.getItem(REDIRECT_KEY) || "";
-  localStorage.removeItem(REDIRECT_KEY);
-  return redirect;
-}
-
-function setDashboardView(view) {
-  if (view === "seller" && canAccessSellerApp()) localStorage.setItem(DASHBOARD_VIEW_KEY, "seller");
-  if (view === "buyer" && canAccessBuyerApp()) localStorage.setItem(DASHBOARD_VIEW_KEY, "buyer");
-}
-
-function getDashboardView() {
-  if (getPrimaryRole() === "seller") {
-    return localStorage.getItem(DASHBOARD_VIEW_KEY) === "buyer" ? "buyer" : "seller";
-  }
-  return "buyer";
-}
-
 function setLoggedIn(value, payload = {}) {
   if (value) {
     if (payload.token) localStorage.setItem(TOKEN_KEY, payload.token);
     if (payload.user) localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
     localStorage.setItem(MOCK_AUTH_KEY, "true");
-    localStorage.setItem(DASHBOARD_VIEW_KEY, payload.user?.primaryRole === "seller" ? "seller" : "buyer");
   } else {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(MOCK_AUTH_KEY);
-    localStorage.removeItem(REDIRECT_KEY);
-    localStorage.removeItem(DASHBOARD_VIEW_KEY);
   }
 }
 
@@ -141,71 +85,31 @@ async function render() {
   const [section, id, sellerId] = getRoute();
   let page = "";
   let active = "home";
-  let variant = "public";
 
   if (!section) {
     page = homePage();
     active = "home";
   } else if (section === "media" && id) {
-    page = isLoggedIn() ? mediaDetailPage(id) : mediaListPage();
+    page = mediaDetailPage(id);
     active = "media";
   } else if (section === "media") {
     page = mediaListPage();
     active = "media";
   } else if (section === "order") {
-    if (!isLoggedIn()) {
-      setRedirect(window.location.hash || "#/");
-      page = loginPage();
-      active = "login";
-    } else if (!canAccessBuyerApp()) {
-      page = permissionDeniedPage("你当前没有 Buyer 权限，不能创建订单。", getDefaultAppRoute());
-      active = "login";
-    } else {
-      page = orderPage(id, sellerId);
-      active = "media";
-    }
+    page = isLoggedIn() ? orderPage(id, sellerId) : loginPage();
+    active = "media";
   } else if (section === "login") {
     page = loginPage();
     active = "login";
-  } else if (section === "register") {
-    page = registerPage();
-    active = "register";
-  } else if (section === "contact") {
-    page = contactPage();
-    active = "contact";
   } else if (section === "buyer" || section === "account") {
-    variant = "app";
-    if (!isLoggedIn()) {
-      setRedirect("#/buyer");
-      variant = "public";
-      page = loginPage();
-      active = "login";
-    } else if (!canAccessBuyerApp()) {
-      page = permissionDeniedPage("你当前没有 Buyer 后台访问权限。", getDefaultAppRoute());
-      active = "app";
-    } else {
-      setDashboardView("buyer");
-      page = buyerDashboardPage();
-      active = "buyer";
-    }
+    page = isLoggedIn() ? buyerDashboardPage() : loginPage();
+    active = "account";
   } else if (section === "seller" || section === "publisher-dashboard") {
-    variant = "app";
-    if (!isLoggedIn()) {
-      setRedirect("#/seller");
-      variant = "public";
-      page = loginPage();
-      active = "login";
-    } else if (!canAccessSellerApp()) {
-      page = permissionDeniedPage("Seller 后台需要先完成申请并审核通过。", "#/buyer");
-      active = "app";
-    } else {
-      setDashboardView("seller");
-      page = sellerDashboardPage();
-      active = "seller";
-    }
+    page = isLoggedIn() ? sellerDashboardPage() : loginPage();
+    active = "admin";
   } else if (section === "admin") {
-    page = permissionDeniedPage("当前展示版本不包含 Admin 系统，管理员后台会独立拆分。", "#/");
-    active = "home";
+    page = isLoggedIn() ? siteAdminDashboardPage() : loginPage();
+    active = "admin";
   } else if (section === "publisher") {
     page = publisherPage();
     active = "publisher";
@@ -213,7 +117,7 @@ async function render() {
     page = homePage();
   }
 
-  app.innerHTML = shell(page, { active, variant });
+  app.innerHTML = shell(page, { active });
   bindInteractions();
   window.scrollTo({ top: 0, behavior: "instant" });
 }
@@ -225,7 +129,6 @@ function bindInteractions() {
 
   bindMediaFilters();
   bindAuth();
-  bindContactForm();
   bindRecharge();
   bindForms();
   bindEditor();
@@ -233,124 +136,31 @@ function bindInteractions() {
 }
 
 function bindAuth() {
-  const loginForm = document.querySelector("[data-login-form]");
-  const registerForm = document.querySelector("[data-register-form]");
-  const [emailInput, passwordInput] = loginForm?.querySelectorAll("input") || [];
-
-  document.querySelectorAll("[data-demo-login]").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (emailInput) emailInput.value = button.dataset.email || "";
-      if (passwordInput) passwordInput.value = button.dataset.password || "";
-      emailInput?.focus();
-    });
-  });
-
-  loginForm?.addEventListener("submit", async (event) => {
+  document.querySelector("[data-login-form]")?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const email = emailInput?.value || "buyer@example.com";
-    const password = passwordInput?.value || "buyer123";
-    const role = loginForm.querySelector("[name='login-role']")?.value || "buyer";
+    const [emailInput, passwordInput] = event.currentTarget.querySelectorAll("input");
+    const email = emailInput?.value || "admin@example.com";
+    const password = passwordInput?.value || "admin123";
     if (apiMode) {
       try {
         const result = await api("/api/auth/login", {
           method: "POST",
           body: JSON.stringify({ email, password }),
         });
-        if (role === "seller" && !result.user?.roles?.includes("seller")) {
-          alert("该账号还没有 Seller 权限，请使用 Buyer 账号登录或先提交 Seller 申请。");
-          return;
-        }
-        if (role === "buyer" && !result.user?.roles?.includes("buyer")) {
-          alert("该账号没有 Buyer 权限。");
-          return;
-        }
-        result.user.primaryRole = role === "seller" && result.user?.roles?.includes("seller") ? "seller" : "buyer";
         setLoggedIn(true, result);
       } catch (error) {
         alert(`登录失败：${error.message}`);
         return;
       }
     } else {
-      const role = email.includes("seller") ? "seller" : "buyer";
-      setLoggedIn(true, {
-        user: {
-          id: `mock_${role}`,
-          name: role === "seller" ? "演示卖家" : "演示买家",
-          email,
-          roles: role === "seller" ? ["buyer", "seller"] : ["buyer"],
-          primaryRole: role,
-          sellerStatus: role === "seller" ? "approved" : "none",
-          balance: role === "seller" ? 0 : 2480,
-        },
-      });
+      setLoggedIn(true);
     }
-    const redirect = consumeRedirect();
-    window.location.hash = redirect || getDefaultAppRoute();
-  });
-
-  registerForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const formData = new FormData(registerForm);
-    const payload = {
-      name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      password: String(formData.get("password") || "").trim(),
-      role: String(formData.get("role") || "buyer"),
-    };
-
-    if (!payload.email || !payload.password) {
-      alert("请填写邮箱和密码。");
-      return;
-    }
-
-    if (apiMode) {
-      try {
-        const result = await api("/api/auth/register", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-        result.user.primaryRole = payload.role === "seller" && result.user?.roles?.includes("seller") ? "seller" : "buyer";
-        setLoggedIn(true, result);
-      } catch (error) {
-        alert(`注册失败：${error.message}`);
-        return;
-      }
-    } else {
-      setLoggedIn(true, {
-        user: {
-          id: `mock_${payload.role}`,
-          name: payload.name || "新用户",
-          email: payload.email,
-          roles: payload.role === "seller" ? ["buyer", "seller"] : ["buyer"],
-          primaryRole: payload.role === "seller" ? "seller" : "buyer",
-          sellerStatus: payload.role === "seller" ? "approved" : "none",
-          balance: 0,
-        },
-      });
-    }
-
-    window.location.hash = getDefaultAppRoute();
+    window.location.hash = "#/media";
   });
 
   document.querySelector("[data-logout]")?.addEventListener("click", () => {
     setLoggedIn(false);
     window.location.hash = "#/";
-  });
-
-  document.querySelectorAll("[data-switch-view]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetView = button.dataset.switchView;
-      setDashboardView(targetView);
-      window.location.hash = targetView === "seller" ? "#/seller" : "#/buyer";
-    });
-  });
-}
-
-function bindContactForm() {
-  document.querySelector("[data-contact-form]")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    alert("你的问题已提交。下一版可以接到真实线索系统或邮件。");
-    event.currentTarget.reset();
   });
 }
 
