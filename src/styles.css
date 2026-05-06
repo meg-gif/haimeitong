@@ -1,19 +1,19 @@
 :root {
-  --bg: #f6f0e8;
+  --bg: #f7fbff;
   --surface: rgba(255, 255, 255, 0.78);
-  --surface-soft: rgba(15, 118, 110, 0.08);
-  --text: #142338;
-  --muted: #607187;
-  --line: rgba(20, 35, 56, 0.12);
-  --primary: #0f766e;
-  --primary-dark: #115e59;
-  --accent: #d97706;
-  --accent-2: #164e63;
+  --surface-soft: rgba(99, 102, 241, 0.09);
+  --text: #101828;
+  --muted: #667085;
+  --line: rgba(99, 102, 241, 0.18);
+  --primary: #13c2b8;
+  --primary-dark: #0e9384;
+  --accent: #8b5cf6;
+  --accent-2: #3b82f6;
   --ink: #eff6ff;
   --ink-2: #ffffff;
-  --warning: #b45309;
+  --warning: #b7791f;
   --success: #12805c;
-  --shadow: 0 24px 70px rgba(37, 51, 74, 0.14);
+  --shadow: 0 24px 70px rgba(74, 85, 162, 0.16);
   --radius: 8px;
 }
 
@@ -24,13 +24,13 @@
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 12% 0%, rgba(15, 118, 110, 0.2), transparent 30vw),
-    radial-gradient(circle at 88% 6%, rgba(217, 119, 6, 0.16), transparent 28vw),
-    radial-gradient(circle at 52% 80%, rgba(22, 78, 99, 0.12), transparent 38vw),
-    linear-gradient(180deg, #fcf9f4 0, #f5efe6 46%, #fbf7f1 100%),
+    radial-gradient(circle at 12% 0%, rgba(19, 194, 184, 0.22), transparent 30vw),
+    radial-gradient(circle at 88% 6%, rgba(139, 92, 246, 0.2), transparent 28vw),
+    radial-gradient(circle at 52% 80%, rgba(59, 130, 246, 0.12), transparent 38vw),
+    linear-gradient(180deg, #fbfdff 0, #f2f7ff 46%, #fbfdff 100%),
     var(--bg);
   color: var(--text);
-  font-family: "Avenir Next", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "Inter", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
   line-height: 1.6;
 }
 
@@ -60,48 +60,6 @@ textarea {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px);
   color: var(--text);
-}
-
-.app-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 72px;
-  padding: 0 32px;
-  border-bottom: 1px solid rgba(20, 35, 56, 0.1);
-  background: rgba(20, 35, 56, 0.94);
-  backdrop-filter: blur(16px);
-  color: #f7fafc;
-}
-
-.app-topbar .brand strong,
-.app-topbar .brand small,
-.app-topbar .nav a,
-.app-topbar .nav a.active {
-  color: #f7fafc;
-}
-
-.app-topbar .nav a.active,
-.app-topbar .nav a:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.app-topbar .button.ghost,
-.logout-link {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  color: #f7fafc;
-}
-
-.app-main {
-  min-height: calc(100vh - 72px);
-  background:
-    radial-gradient(circle at 20% 0%, rgba(15, 118, 110, 0.1), transparent 28vw),
-    linear-gradient(180deg, #eef3f8 0, #f7f9fc 40%, #fcfdfd 100%);
 }
 
 .brand {
@@ -1633,307 +1591,7 @@ td .mini-button + .mini-button {
     padding: 28px 20px;
   }
 
-.footer-links {
-  flex-wrap: wrap;
-  }
-}
-
-.hero--editorial {
-  padding-top: 84px;
-}
-
-.hero-badges,
-.hero-mini-stats,
-.quote-ladder,
-.insight-grid,
-.category-grid,
-.market-summary,
-.detail-chip-grid,
-.demo-account-list {
-  display: grid;
-  gap: 12px;
-}
-
-.hero-badges {
-  grid-template-columns: repeat(3, max-content);
-  margin-top: 18px;
-}
-
-.hero-badges span,
-.hero-mini-stats div,
-.quote-ladder div,
-.market-summary article,
-.detail-chip-grid div {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.68);
-}
-
-.hero-badges span {
-  min-height: 34px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.hero-mini-stats {
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 24px;
-}
-
-.hero-mini-stats div,
-.market-summary article,
-.detail-chip-grid div {
-  padding: 14px 16px;
-}
-
-.hero-mini-stats span,
-.quote-ladder span,
-.market-summary span,
-.detail-chip-grid span {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.hero-mini-stats strong,
-.quote-ladder strong,
-.market-summary strong,
-.detail-chip-grid strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 20px;
-}
-
-.hero-panel--stack {
-  display: grid;
-  gap: 14px;
-}
-
-.signal-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(217, 119, 6, 0.1));
-}
-
-.signal-card span,
-.signal-card strong,
-.signal-card b {
-  display: block;
-}
-
-.signal-card b {
-  color: var(--accent);
-  font-size: 28px;
-  line-height: 1;
-}
-
-.quote-ladder {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.quote-ladder div {
-  padding: 14px;
-}
-
-.quote-ladder em,
-.market-summary em {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-style: normal;
-  font-size: 12px;
-}
-
-.story-strip,
-.featured-section {
-  padding-top: 18px;
-}
-
-.insight-grid,
-.category-grid,
-.market-summary {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.insight-grid article,
-.category-card,
-.cta-band,
-.login-intro,
-.login-panel {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.68));
-  box-shadow: 0 22px 70px rgba(37, 51, 74, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.75);
-}
-
-.insight-grid article,
-.category-card {
-  padding: 20px;
-}
-
-.insight-grid article span,
-.category-card span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
-  font-weight: 800;
-}
-
-.insight-grid article strong,
-.category-card strong {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 20px;
-}
-
-.featured-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) 320px;
-  gap: 18px;
-  align-items: start;
-}
-
-.compare-card {
-  display: grid;
-  gap: 18px;
-  position: sticky;
-  top: 92px;
-}
-
-.cta-band {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto 60px;
-  padding: 24px 28px;
-  background: linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(217, 119, 6, 0.1)), rgba(255, 255, 255, 0.84);
-}
-
-.market-summary {
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto 22px;
-}
-
-.media-detail-grid {
-  margin-top: 10px;
-}
-
-.detail-overview-card p {
-  margin-top: 0;
-}
-
-.detail-chip-grid {
-  grid-template-columns: repeat(4, 1fr);
-  margin-top: 18px;
-}
-
-.login-shell {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 22px;
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 56px 0 72px;
-}
-
-.login-intro,
-.login-panel {
-  padding: 24px;
-}
-
-.login-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 18px;
-}
-
-.login-card h2,
-.demo-account-card h2 {
-  margin: 0 0 8px;
-}
-
-.demo-account-card {
-  display: grid;
-  gap: 16px;
-}
-
-.demo-account-list button {
-  justify-content: center;
-}
-
-.warning-tags span {
-  color: #9a3412;
-  background: rgba(249, 115, 22, 0.08);
-}
-
-.button.secondary {
-  color: #9a3412;
-  border-color: rgba(217, 119, 6, 0.22);
-  background: rgba(217, 119, 6, 0.08);
-}
-
-.price-badge {
-  color: #9a3412;
-  background: rgba(217, 119, 6, 0.12);
-}
-
-th {
-  background: rgba(20, 35, 56, 0.04);
-}
-
-.site-metrics-grid,
-.table-wrap {
-  background: rgba(255, 255, 255, 0.82);
-}
-
-@media (max-width: 1080px) {
-  .featured-layout,
-  .login-shell,
-  .login-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-badges,
-  .quote-ladder,
-  .insight-grid,
-  .category-grid,
-  .market-summary,
-  .detail-chip-grid,
-  .hero-mini-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .cta-band {
-    align-items: stretch;
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 720px) {
-  .hero-badges,
-  .quote-ladder,
-  .insight-grid,
-  .category-grid,
-  .market-summary,
-  .detail-chip-grid,
-  .hero-mini-stats {
-    grid-template-columns: 1fr;
+  .footer-links {
+    flex-wrap: wrap;
   }
 }
